@@ -1,0 +1,9 @@
+services:
+  api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4000:{{PORT}}"
+    env_file:
+      - .env.yml
