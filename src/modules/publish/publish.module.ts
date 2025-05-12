@@ -22,7 +22,7 @@ import { PublishService } from "./publish.service";
             transport: Transport.KAFKA,
             options: {
               client: {
-                clientId: 'hero',
+                clientId: 'nest-kafka-publisher',
                 brokers: broker,
               },
               producer: {

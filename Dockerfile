@@ -35,7 +35,7 @@ RUN npm install -g pnpm --force
 RUN pnpm build
 
 ENV NODE_ENV production
-
+ENV CI=true
 RUN pnpm install --only=production
 
 USER node

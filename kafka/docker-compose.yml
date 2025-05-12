@@ -1,26 +1,27 @@
+# This is a Docker Compose file for running a Kafka broker with controller functionality.
 services:
   kafka:
     image: apache/kafka:4.0.0
     ports:
-      - "9092:9092"
+      - "19092:19092"
+      - "9093:9093"
     environment:
-      # Configure listeners for both docker and host communication
-      KAFKA_LISTENERS: CONTROLLER://localhost:9091,HOST://0.0.0.0:9092,DOCKER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: HOST://localhost:9092,DOCKER://kafka:9093
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,DOCKER:PLAINTEXT,HOST:PLAINTEXT
+      # Listener setup
+      KAFKA_LISTENERS: CONTROLLER://0.0.0.0:9091,BROKER://0.0.0.0:19092,DOCKER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: BROKER://host.docker.internal:19092,DOCKER://kafka:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,BROKER:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER
+
       # Settings required for KRaft mode
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9091
-      # Listener to use for broker-to-broker communication
-      KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER
-      # Required for a single node cluster
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_LOG_RETENTION_HOURS: 168
+
     volumes:
       - ./kafka-data:/var/lib/kafka/data
-      
+    
   kafka-ui:
     image: kafbat/kafka-ui:main
     ports:

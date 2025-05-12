@@ -3,7 +3,11 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "4000:{{PORT}}"
+      network: host
     env_file:
       - .env.yml
+    restart: always
+    ports:
+      - "4000:4000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

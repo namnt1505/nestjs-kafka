@@ -27,6 +27,8 @@ async function bootstrap() {
   const { appName, appPort, hostName } = appCfg;
   const { broker } = kafkaCfg;
 
+  console.log({ broker });
+
   // Setup Kafka microservice
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.KAFKA,
