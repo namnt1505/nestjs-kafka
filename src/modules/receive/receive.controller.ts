@@ -1,14 +1,20 @@
-import { Controller } from '@nestjs/common';
-import { EventPattern, Payload } from '@nestjs/microservices';
-import { ReceiveService } from './receive.service';
+import { Controller, Inject } from '@nestjs/common';
+import { ClientKafka, Ctx, EventPattern, KafkaContext, MessagePattern, Payload } from '@nestjs/microservices';
 
 @Controller()
 export class ReceiveController {
-  constructor(private readonly receiveService: ReceiveService) { }
+  constructor(
+    @Inject('KAFKA_SERVICE')
+    private readonly kafkaClient: ClientKafka) { }
 
-  @EventPattern('test-topic')
-  async handleMessage(@Payload() message: any) {
+  onModuleInit() {
+    this.kafkaClient.subscribeToResponseOf('receiver');
+    this.kafkaClient.connect();
+  }
+
+  @MessagePattern('publish')
+  async handleMessage(@Payload() message: any, @Ctx() context: KafkaContext) {
     console.log('Received message in controller:', message);
-    return this.receiveService.handleMessage(message);
+    return this.kafkaClient.emit('receiver', 'Recived message in controller');
   }
 }

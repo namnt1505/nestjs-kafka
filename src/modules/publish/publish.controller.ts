@@ -1,12 +1,20 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { PublishService } from './publish.service';
+import { Body, Controller, Inject, Post } from '@nestjs/common';
+import { ClientKafka, Ctx, EventPattern, KafkaContext, Payload } from '@nestjs/microservices';
 
 @Controller('publish')
 export class PublishController {
-  constructor(private readonly publishService: PublishService) { }
+  constructor(
+    @Inject('KAFKA_SERVICE')
+    private readonly kafkaClient: ClientKafka) { }
+
+  onModuleInit() {
+    this.kafkaClient.subscribeToResponseOf('publish');
+    this.kafkaClient.connect();
+  }
+
 
   @Post('message')
   async publishMessage(@Body() message: any) {
-    return this.publishService.publishMessage(message);
+    return this.kafkaClient.emit('publish', { message: message });
   }
 }
